@@ -5,9 +5,9 @@ from src.parsers.Parser import Parser
 
 class Validator(ABC):
     @abstractmethod
-    def validate(self, data: Dict[str, str]) -> bool:
+    def validate(self) -> bool:
         pass
 
     @abstractmethod
-    def extract_data(self, content: str) -> Dict:
+    def get_discrepancy(self) -> str:
         pass
