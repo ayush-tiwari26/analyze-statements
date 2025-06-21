@@ -40,8 +40,7 @@ class Pdf2MarkdownParser(Parser):
 
     def get_content(self) -> Dict[str, str]:
         if not self.pdf_files:
-            print("Warning: No PDF files found. Run get_files() first or check the source directory.")
-            return {}
+            self.get_files()
 
         all_markdown_content = {}
         for pdf_path in self.pdf_files:

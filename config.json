@@ -1,4 +1,5 @@
 {
   "drive_input": "https://drive.google.com/drive/u/2/folders/1ezBe4hPnUY1x-n4eI9WfCS8nHxTr_0pq",
-  "local_pdf_source": "/Users/ayush.tiwari/Desktop/python/kaaj/resources/data"
+  "local_pdf_source": "/Users/ayush.tiwari/Desktop/python/kaaj/resources/data",
+  "plots_output_dir": "output"
 }

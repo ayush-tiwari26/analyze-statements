@@ -8,9 +8,10 @@ from src.utils.LLMRouter import LLMRouter, Model
 
 class LLMExtractor(Extractor):
 
-    def __init__(self, parser):
+    def __init__(self, parser, model=Model.LLAMA_LG):
         self.data = None
         self.parser = parser
+        self.model = model
 
     def parse_data(self) -> Dict[str, str]:
         self.data = self.parser.get_content()
@@ -38,6 +39,6 @@ class LLMExtractor(Extractor):
             NOTE: Do not include any commentary. Response must ONLY be a json
         """
         prompt = content + prompt
-        json = router.hit(Model.LLAMA_SM, prompt)
+        json = router.hit(self.model, prompt)
         decoded_object = json_repair.loads(json)
         return decoded_object

@@ -8,7 +8,7 @@ from src.parsers.Parser import Parser
 class DrivePdfParser(Parser):
     """
     A parser to download PDF files from a public Google Drive folder
-    and extract their text content.
+    and get their text content.
     """
 
     def __init__(self, config: Dict[str, Any]):
@@ -27,7 +27,6 @@ class DrivePdfParser(Parser):
         return self.downloaded_files
 
     def get_content(self, pdf_path: Path) -> str:
-        print(f"Extracting content from: {pdf_path.name}")
         try:
             doc = pymupdf.open(pdf_path)
             full_text = ""

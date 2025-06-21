@@ -32,11 +32,10 @@ class PdfParser(Parser):
 
     def get_content(self) -> Dict[str, str]:
         if not self.pdf_files:
-            print("Warning: No PDF files found. Run get_files() first or check the source directory.")
-            return {}
+            self.get_files()
+
         all_content = {}
         for pdf_path in self.pdf_files:
-            print(f"Extracting content from: {pdf_path.name}")
             try:
                 doc = pymupdf.open(pdf_path)
                 full_text = ""
