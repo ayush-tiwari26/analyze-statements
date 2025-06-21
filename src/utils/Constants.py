@@ -1,0 +1,7 @@
+STARTING_BALANCE = "starting_balance"
+ENDING_BALANCE = "ending_balance"
+TRANSACTIONS = "transactions"
+AMOUNT = "amount"
+DIRECTION = "direction"
+CREDIT = "credit"
+DEBIT = "debit"
