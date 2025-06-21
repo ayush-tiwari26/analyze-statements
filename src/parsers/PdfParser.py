@@ -1,4 +1,3 @@
-import gdown
 import pymupdf
 from typing import List, Dict, Any
 from pathlib import Path
@@ -7,25 +6,28 @@ from src.parsers.Parser import Parser
 
 class PdfParser(Parser):
     """
-    A parser to download PDF files from a public Google Drive folder
+    A parser to find all PDF files within a specified local directory
     and extract their text content.
     """
 
     def __init__(self, config: Dict[str, Any]):
-        self.drive_link: str = config.get("drive_input")
-        if not self.drive_link:
-            raise ValueError("Configuration object must contain a 'drive_input' key.")
+        source_path_str = config.get("local_pdf_source")
+        if not source_path_str:
+            raise ValueError("Configuration object must contain a 'local_pdf_source' key.")
 
-        self.downloaded_files: List[Path] = []
-        self.output_dir = Path("data/raw_pdfs")
+        self.source_directory = Path(source_path_str)
+        self.pdf_files: List[Path] = []
 
     def get_files(self) -> List[Path]:
-        self.output_dir.mkdir(parents=True, exist_ok=True)
-        print(f"Attempting to download files from: {self.drive_link}")
-        gdown.download_folder(self.drive_link, output=str(self.output_dir), quiet=True, use_cookies=False)
-        self.downloaded_files = list(self.output_dir.rglob("*.pdf"))
-        print(f"Successfully downloaded {len(self.downloaded_files)} PDF file(s).")
-        return self.downloaded_files
+        print(f"Scanning for PDF files in: '{self.source_directory}'")
+
+        if not self.source_directory.is_dir():
+            raise FileNotFoundError(f"The specified source directory does not exist: {self.source_directory}")
+
+        self.pdf_files = list(self.source_directory.rglob("*.pdf"))
+
+        print(f"Found {len(self.pdf_files)} PDF file(s).")
+        return self.pdf_files
 
     def get_content(self, pdf_path: Path) -> str:
         print(f"Extracting content from: {pdf_path.name}")
