@@ -1,12 +1,12 @@
 from abc import ABC, abstractmethod
-from typing import List, Any
+from typing import List, Any, Dict
 
 
 class Parser(ABC):
     @abstractmethod
-    def get_files(self, input: str) -> List[Any]:
+    def get_files(self) -> List[Any]:
         pass
 
     @abstractmethod
-    def get_content(self, obj: Any) -> str:
+    def get_content(self) -> Dict[str, str]:
         pass

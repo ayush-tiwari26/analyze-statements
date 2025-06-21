@@ -1,4 +1,4 @@
-import pymupdf
+import pymupdf  # Also known as fitz
 from typing import List, Dict, Any
 from pathlib import Path
 from src.parsers.Parser import Parser
@@ -7,7 +7,7 @@ from src.parsers.Parser import Parser
 class PdfParser(Parser):
     """
     A parser to find all PDF files within a specified local directory
-    and extract their text content.
+    and extract their text content into a dictionary.
     """
 
     def __init__(self, config: Dict[str, Any]):
@@ -16,6 +16,7 @@ class PdfParser(Parser):
             raise ValueError("Configuration object must contain a 'local_pdf_source' key.")
 
         self.source_directory = Path(source_path_str)
+        # Internal state to hold the list of discovered file paths
         self.pdf_files: List[Path] = []
 
     def get_files(self) -> List[Path]:
@@ -29,15 +30,24 @@ class PdfParser(Parser):
         print(f"Found {len(self.pdf_files)} PDF file(s).")
         return self.pdf_files
 
-    def get_content(self, pdf_path: Path) -> str:
-        print(f"Extracting content from: {pdf_path.name}")
-        try:
-            doc = pymupdf.open(pdf_path)
-            full_text = ""
-            for page in doc:
-                full_text += page.get_text()
-            doc.close()
-            return full_text
-        except Exception as e:
-            print(f"Error reading PDF file {pdf_path}: {e}")
-            return ""
+    def get_content(self) -> Dict[str, str]:
+        if not self.pdf_files:
+            print("Warning: No PDF files found. Run get_files() first or check the source directory.")
+            return {}
+        all_content = {}
+        for pdf_path in self.pdf_files:
+            print(f"Extracting content from: {pdf_path.name}")
+            try:
+                doc = pymupdf.open(pdf_path)
+                full_text = ""
+                for page in doc:
+                    full_text += page.get_text("text")  # "text" argument for plain text
+                doc.close()
+                # Use the filename as the key
+                all_content[pdf_path.name] = full_text
+            except Exception as e:
+                error_message = f"Error reading file: {e}"
+                print(f"Failed to process {pdf_path.name}. Reason: {e}")
+                all_content[pdf_path.name] = error_message
+
+        return all_content
