@@ -12,21 +12,22 @@ if __name__ == '__main__':
     # Loading data
     parser = PdfParser(config=config)
     # Extracting data
-    extractor = LLMExtractor(parser)
-    data = extractor.parse_data()
-    for name in data.keys():
-        if name == '18.pdf':
-            test_content = data[name]
-    # Sample for 1 Bank
-    statement = extractor.extract_data(test_content)
-    print(json.dumps(statement))
+    extractor = LLMExtractor(parser, Model.DEEPSEEK)
+    bank_statements = extractor.extract()
+    print(json.dumps(bank_statements))
 
     # Validation
-    validator = VanillaValidator(statement)
-    print(validator.validate())
-    print(validator.get_discrepancy())
+    for key in bank_statements.keys():
+        print(f"Validating for Bank {key}")
+        validator = VanillaValidator(bank_statements)
+        if validator.validate():
+            print(f"\tStatement is valid")
+        else:
+            print(f"\tStatement is Invalid")
+            print(f"\t{validator.get_discrepancy()}")
+        print("=======================================\n\n")
 
     # Visualization
     visualizer = Visualizer()
-    visualizer.plot_balance_distribution(statement)
+    visualizer.plot_balance_distribution(bank_statements)
     visualizer.save_plot(config)

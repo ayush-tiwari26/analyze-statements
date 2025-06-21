@@ -1,23 +1,33 @@
+import time
 from typing import Dict
 
 import json_repair
 
 from src.extraction.Extractor import Extractor
+from src.parsers.Parser import Parser
 from src.utils.LLMRouter import LLMRouter, Model
 
 
 class LLMExtractor(Extractor):
 
     def __init__(self, parser, model=Model.LLAMA_LG):
-        self.data = None
-        self.parser = parser
-        self.model = model
+        self.data: Dict = None
+        self.parser: Parser = parser
+        self.model: Model = model
 
-    def parse_data(self) -> Dict[str, str]:
+    def extract(self) -> Dict[str, Dict]:
         self.data = self.parser.get_content()
-        return self.data
+        extracted_data = {}
+        start_time = time.time()
+        total = len(self.data)
+        for i, key in enumerate(self.data.keys(), 1):
+            elapsed = time.time() - start_time
+            print(f"\rMaking LLM calls [{i}/{total}] - Elapsed: {elapsed:.2f}s", end='', flush=True)
+            extracted_data[key] = self.extract_single(self.data[key])
+        print("\n","Done.")
+        return extracted_data
 
-    def extract_data(self, content: str) -> Dict:
+    def extract_single(self, content: str) -> Dict:
         router = LLMRouter()
         prompt = """
         

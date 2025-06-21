@@ -1,6 +1,7 @@
 import regex as re
 from typing import List, Dict, Any
 from src.extraction.Extractor import Extractor
+from src.parsers.Parser import Parser
 
 
 class VanillaExtractor(Extractor):
@@ -22,14 +23,17 @@ class VanillaExtractor(Extractor):
     )
 
     def __init__(self, parser):
-        self.data = None
-        self.parser = parser
+        self.data: Dict = None
+        self.parser: Parser = parser
 
-    def parse_data(self) -> Dict[str, str]:
+    def extract(self) -> Dict[str, Dict]:
         self.data = self.parser.get_content()
-        return self.data
+        extracted_data = {}
+        for key in self.data.keys():
+            extracted_data[key] = self.extract_single(self.data[key])
+        return extracted_data
 
-    def extract_data(self, content: str) -> Dict:
+    def extract_single(self, content: str) -> Dict:
         """
         Parses a raw string from a bank statement to extract a structured list of transactions.
         """

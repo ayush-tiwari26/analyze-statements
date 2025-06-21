@@ -4,7 +4,7 @@ import numpy as np
 from typing import Dict, Any
 from pathlib import Path
 
-from numpy.distutils.lib2def import output_def
+from src.utils.Constants import *
 
 
 class Visualizer:
@@ -26,15 +26,14 @@ class Visualizer:
             print("Warning: No statement data provided to visualize.")
             return
 
-        # --- Data Extraction for Variance Analysis ---
         starting_balances = []
         ending_balances = []
         transaction_volumes = []
 
         for statement_details in statements_data.values():
-            starting_balances.append(statement_details.get('starting_balance', 0))
-            ending_balances.append(statement_details.get('ending_balance', 0))
-            transaction_volumes.append(len(statement_details.get('transactions', [])))
+            starting_balances.append(statement_details.get(STARTING_BALANCE, 0))
+            ending_balances.append(statement_details.get(ENDING_BALANCE, 0))
+            transaction_volumes.append(len(statement_details.get(TRANSACTIONS, [])))
 
         # --- Variance Calculation ---
         self.starting_balance_variance = np.var(starting_balances) if starting_balances else 0
@@ -64,23 +63,3 @@ class Visualizer:
         self.fig.savefig(output_path, dpi=300, bbox_inches='tight')
         plt.close(self.fig)
         print(f"Visualization saved successfully to: {output_path}")
-
-
-# --- Example Usage ---
-if __name__ == '__main__':
-    # Sample data matching the expected input format
-
-    # 1. Instantiate the visualizer
-    visualizer = Visualizer()
-
-    # 2. Generate the plot and calculate variances
-    visualizer.plot_balance_distribution(sample_data)
-
-    # 3. Save the plot to a file
-    visualizer.save_plot("output/balance_distribution.png")
-
-    # 4. (Optional) Access and print the calculated variances
-    print("\n--- Calculated Variances ---")
-    print(f"Ending Balance Variance: {visualizer.ending_balance_variance:.2f}")
-    print(f"Starting Balance Variance: {visualizer.starting_balance_variance:.2f}")
-    print(f"Transaction Volume Variance: {visualizer.transaction_volume_variance:.2f}")

@@ -1,11 +1,7 @@
-# First, ensure you have marker-pdf and its dependencies installed:
-# pip install marker-pdf torch
-
 from marker.convert import convert_single_pdf
 from marker.models import load_all_models
 from typing import List, Dict, Any
 from pathlib import Path
-
 from src.parsers.Parser import Parser
 
 

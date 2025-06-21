@@ -5,9 +5,9 @@ from src.parsers.Parser import Parser
 
 class Extractor(ABC):
     @abstractmethod
-    def parse_data(self) -> List[str]:
+    def extract(self) -> Dict[str, Dict]:
         pass
 
     @abstractmethod
-    def extract_data(self, content: str) -> Dict:
+    def extract_single(self, content: str) -> Dict:
         pass
