@@ -12,7 +12,8 @@ class VanillaExtractor(Extractor):
         r"(?P<description>.+?)\s{2,}"  # 2. Description (non-greedy, followed by at least 2 spaces)
         r"(?P<debit>[\d,]+\.\d{2})?\s+"  # 3. Debit amount (optional)
         r"(?P<credit>[\d,]+\.\d{2})?\s+"  # 4. Credit amount (optional)
-        r"([\d,]+\.\d{2})$"  # 5. Ending balance (must be present to anchor the line)
+        r"([\d,]+\.\d{2})$",  # 5. Ending balance (must be present to anchor the line)
+        re.IGNORECASE
     )
     INLINE_PATTERN = re.compile(
         r"^(?P<date>\d{1,2}[-/]\d{1,2}[/-]\d{2,4})\s+"  # 1. Date
