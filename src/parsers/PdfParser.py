@@ -2,6 +2,7 @@ import pymupdf  # Also known as fitz
 from typing import List, Dict, Any
 from pathlib import Path
 from src.parsers.Parser import Parser
+from src.utils.load_configs import load_configs
 
 
 class PdfParser(Parser):
@@ -10,8 +11,8 @@ class PdfParser(Parser):
     and extract their text content into a dictionary.
     """
 
-    def __init__(self, config: Dict[str, Any]):
-        source_path_str = config.get("local_pdf_source")
+    def __init__(self):
+        source_path_str = load_configs()["local_pdf_source"]
         if not source_path_str:
             raise ValueError("Configuration object must contain a 'local_pdf_source' key.")
 

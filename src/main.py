@@ -1,6 +1,6 @@
 import json
 from src.extraction.LLMExtractor import LLMExtractor
-from src.extraction.VanillaExtractor import VanillaExtractor
+from src.parsers.Pdf2MarkdownParser import Pdf2MarkdownParser
 from src.parsers.PdfParser import PdfParser
 from src.utils.LLMRouter import LLMRouter, Model
 from src.utils.load_configs import load_configs
@@ -10,9 +10,9 @@ from src.visualization.Visualizer import Visualizer
 if __name__ == '__main__':
     config = load_configs()
     # Loading data
-    parser = PdfParser(config=config)
+    parser = Pdf2MarkdownParser()
     # Extracting data
-    extractor = LLMExtractor(parser, Model.LLAMA_SM)
+    extractor = LLMExtractor(parser, Model.DEEPSEEK)
     bank_statements = extractor.extract()
     print(json.dumps(bank_statements))
 
@@ -25,7 +25,7 @@ if __name__ == '__main__':
         print(f"Validating for Bank: {name}")
         if not is_valid[name]:
             print(f"\tStatement has discrepancy")
-            print(f"\t{validator.get_discrepancy()}")
+            print(f"\t{validator.get_discrepancy()[name]}")
         else:
             print(f"\tStatement is valid, no discrepancy")
         print("=======================================\n\n")

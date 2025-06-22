@@ -1,36 +1,40 @@
-from marker.convert import convert_single_pdf
-from marker.models import load_all_models
-from typing import List, Dict, Any
+from marker.converters.pdf import PdfConverter
+from marker.models import create_model_dict
+from marker.output import text_from_rendered
+from typing import List, Dict
 from pathlib import Path
 from src.parsers.Parser import Parser
+from src.utils.disk_cache import get_disk_cache, set_disk_cache
+from src.utils.load_configs import load_configs
 
 
 class Pdf2MarkdownParser(Parser):
     """
-    A parser that utilizes the 'marker-pdf' library to convert all PDF files
-    within a specified local directory into Markdown format.
+    A parser that uses the 'marker' library to convert PDFs to Markdown.
     """
-    def __init__(self, config: Dict[str, Any]):
-        source_path_str = config.get("local_pdf_source")
+
+    def __init__(self):
+        source_path_str = load_configs().get("local_pdf_source")
         if not source_path_str:
-            raise ValueError("Configuration object must contain a 'local_pdf_source' key.")
+            raise ValueError("Configuration must contain 'local_pdf_source'.")
 
         self.source_directory = Path(source_path_str)
         self.pdf_files: List[Path] = []
 
-        # Load the models once during initialization for efficiency
+        # Initialize PdfConverter with model artifacts
         print("Loading Marker models... This may take a moment.")
-        self.marker_models = load_all_models()
+        self.converter = PdfConverter(
+            artifact_dict=create_model_dict()
+        )
         print("Marker models loaded successfully.")
 
     def get_files(self) -> List[Path]:
         print(f"Scanning for PDF files in: '{self.source_directory}'")
 
         if not self.source_directory.is_dir():
-            raise FileNotFoundError(f"The specified source directory does not exist: {self.source_directory}")
+            raise FileNotFoundError(f"Directory does not exist: {self.source_directory}")
 
         self.pdf_files = list(self.source_directory.rglob("*.pdf"))
-
         print(f"Found {len(self.pdf_files)} PDF file(s).")
         return self.pdf_files
 
@@ -39,17 +43,24 @@ class Pdf2MarkdownParser(Parser):
             self.get_files()
 
         all_markdown_content = {}
+
         for pdf_path in self.pdf_files:
+            # Disk persistent caching of python objects for efficiency
             print(f"Converting to Markdown: {pdf_path.name}")
             try:
-                # Use the convert_single_pdf function from the marker library
-                markdown_text, _, _ = convert_single_pdf(str(pdf_path), self.marker_models)
-
-                # Use the filename as the key
-                all_markdown_content[pdf_path.name] = markdown_text
+                cached_markdown_text = get_disk_cache(pdf_path.name)
+                if cached_markdown_text is not None:
+                    all_markdown_content[pdf_path.name] = cached_markdown_text
+                else:
+                    rendered = self.converter(str(pdf_path))
+                    markdown_text, _, _ = text_from_rendered(rendered)
+                    all_markdown_content[pdf_path.name] = markdown_text
+                    try:
+                        set_disk_cache(pdf_path.name, markdown_text)
+                    except Exception as e:
+                        print(f"Failed to cache content for {pdf_path.name}")
             except Exception as e:
-                error_message = f"Error converting file with Marker: {e}"
                 print(f"Failed to process {pdf_path.name}. Reason: {e}")
-                all_markdown_content[pdf_path.name] = error_message
+                all_markdown_content[pdf_path.name] = f"Error converting file: {e}"
 
         return all_markdown_content

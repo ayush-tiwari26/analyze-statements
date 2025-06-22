@@ -30,7 +30,11 @@ class Visualizer:
         ending_balances = []
         transaction_volumes = []
 
-        for statement_details in statements_data.values():
+        for key in statements_data.keys():
+            statement_details = statements_data[key]
+            if not statement_details:
+                print(f"WARNING: Empty statement_details for {key}, skipping")
+                continue
             starting_balances.append(statement_details.get(STARTING_BALANCE, 0))
             ending_balances.append(statement_details.get(ENDING_BALANCE, 0))
             transaction_volumes.append(len(statement_details.get(TRANSACTIONS, [])))
