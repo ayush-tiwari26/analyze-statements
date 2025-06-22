@@ -11,12 +11,10 @@ class Visualizer:
 
     def __init__(self):
         """Initializes the Visualizer's state."""
+        self.running_balance_variance = None
         self.fig = None
         self.ax = None
         # Attributes to store calculated variances
-        self.starting_balance_variance: float = 0.0
-        self.ending_balance_variance: float = 0.0
-        self.transaction_volume_variance: float = 0.0
 
     def plot_balance_distribution(self, statements_data: Dict[str, Dict[str, Any]]) -> None:
         """
@@ -26,19 +24,20 @@ class Visualizer:
             print("Warning: No statement data provided to visualize.")
             return
 
-        running_balances = []
+        ending_variances = {}
 
         for key, statement in statements_data.items():
             if not statement:
                 print(f"WARNING: Empty statement_details for {key}, skipping")
                 continue
 
-            balance = statement.get(STARTING_BALANCE, 0)
+            balance = abs(statement.get(STARTING_BALANCE, 0))
             transactions = statement.get(TRANSACTIONS, [])
+            running_balance = [balance]
 
             for txn in transactions:
                 direction = txn.get("direction", "").lower()
-                amount = txn.get("amount", 0)
+                amount = abs(txn.get("amount", 0))
 
                 if direction == "debit":
                     balance -= amount
@@ -47,21 +46,21 @@ class Visualizer:
                 else:
                     print(f"! Unknown direction '{direction}' in {key}, skipping transaction.")
                     continue
+                running_balance.append(balance)
+            ending_variances[key] = np.var(running_balance)
 
-                running_balances.append(balance)
-
-        if not running_balances:
+        if not ending_variances:
             print("No running balances computed; cannot plot.")
             return
-
-        # --- Variance Calculation ---
-        self.running_balance_variance = np.var(running_balances)
 
         # --- Graph Plotting ---
         self.fig, self.ax = plt.subplots(figsize=(12, 7))
         sns.set_theme(style="whitegrid")
 
-        sns.histplot(data=running_balances, kde=True, ax=self.ax, bins=10)
+        sns.lineplot(x=ending_variances.keys(),
+                     y=ending_variances.values(),
+                     ax=self.ax,
+                     marker="o")
 
         self.ax.set_title('Distribution of Running Balances Across All Transactions', fontsize=16)
         self.ax.set_xlabel('Running Balance Value', fontsize=12)

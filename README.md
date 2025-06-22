@@ -103,61 +103,6 @@ pytest
 
 ---
 
-## 🔍 Module-by-Module Breakdown
-
-### 1. `parsers/`
-
-| File | Purpose | Key Tech |
-| :-- | :-- | :-- |
-| `Parser.py` | ABC with `get_files()` \& `get_content()` | `abc.ABC` |
-| `PdfParser.py` | Fast text extraction using **PyMuPDF** | `pymupdf` |
-| `Pdf2MarkdownParser.py` | High-fidelity layout via **marker-pdf** (Markdown) | `marker-pdf`, `torch` |
-| `DrivePdfParser.py` | Placeholder for reading PDFs directly from Google Drive | Google API |
-
-### 2. `extraction/`
-
-| File | Purpose |
-| :-- | :-- |
-| `Extractor.py` | ABC with `parse_data()` / `extract_data()` |
-| `VanillaExtractor.py` | Uses finely-tuned regex to pull columns (`date description debit credit …`) |
-| `LLMExtractor.py` | Sends *prompt + raw text* to an LLM (see `utils/LLMRouter.py`), repairs JSON with `json_repair` |
-
-### 3. `utils/`
-
-| File | Purpose |
-| :-- | :-- |
-| `LLMRouter.py` | Local “OpenAI-style” endpoint wrapper. Saves every request/response as cURL in `logs/`. |
-| `Constants.py` | String enums (`STARTING_BALANCE`, `DEBIT`, …) |
-| `load_configs.py` | Single-line helper to read `config.json` |
-
-### 4. `validation/`
-
-`VanillaValidator.py` recomputes ending balance and produces a numeric \& percentual discrepancy report.
-
-### 5. `visualization/`
-
-`Visualizer.py`
-
-- Calculates variance of `starting_balance`, `ending_balance`, and transaction counts
-- Plots a **Seaborn** histogram of ending balances
-- Exposes the variances as attributes and saves figures as **300 DPI PNG**s.
-
----
-
-## ⚙️ Configuration (`config.json`)
-
-```jsonc
-{
-  "local_pdf_source": "resources/data",
-  "plots_output_dir": "output/plots",
-  "llm_model": "LLAMA_LG"
-}
-```
-
-Change paths or model names (`LLAMA_SM`, `LLAMA_LG`, `DEEPSEEK`, …) as needed.
-
----
-
 ## 🏃‍♀️ Dev Start
 
 > Host any LLM on `localhost:3000` following the [open-webui schema](https://docs.openwebui.com/getting-started/api-endpoints).
@@ -166,7 +111,7 @@ Change paths or model names (`LLAMA_SM`, `LLAMA_LG`, `DEEPSEEK`, …) as needed.
 Setup ollama & openwebui
 1. [Get & Run ollama models](https://ollama.com/download)
 2. Run openweb-ui
-```python
+```bash
 pip install open-webui
 open-webui serve
 ```
@@ -191,7 +136,41 @@ python -m src.main
 
 ---
 
-## 📈 Example Console Output
+## Results
+
+### Test Set
+1. 20 PDF documents.
+2. Stored in `resources/data` directory.
+
+### Parsing
+
+| File | Purpose                                                 | Key Tech |
+| :-- |:--------------------------------------------------------| :-- |
+| `Parser.py` | Interface    |  |
+| `PdfParser.py` | Fast text extraction using **PyMuPDF**                  | `pymupdf` |
+| `Pdf2MarkdownParser.py` | High-fidelity layout via **marker-pdf** (Markdown)      | `marker-pdf`, `torch` |
+| `DrivePdfParser.py` | Placeholder for reading PDFs directly from Google Drive | Google API |
+
+
+### Extraction Result
+1. OCR on PDF documents are used to convert to markdown.
+2. Markdown performed best for inputs to LLM since it maintains formating & structure of PDF data.
+3. Performs faster rather than feeding whole PDF to LLM.
+4. Model used is `llama2-uncensored:latest`
+
+
+| File | Purpose                                                                                         |
+| :-- |:------------------------------------------------------------------------------------------------|
+| `Extractor.py` | Interface                                                                                       |                                                                                              
+| `VanillaExtractor.py` | Uses finely-tuned regex to pull columns (`date description debit credit …`)                     |
+| `LLMExtractor.py` | Sends *prompt + markdown* to an LLM (see `utils/LLMRouter.py`), repairs JSON with `json_repair` |
+
+
+### Validation Result
+
+1. Depends on Accuracy of Extraction Stage.
+2. For full validation results check `validation_results.xlsx` at `output/validation`
+3. Console output
 
 ```
 Scanning for PDF files in: 'resources/data'
@@ -217,6 +196,15 @@ Discrepancy as % of transaction volume: 0.00%
 Visualization saved successfully to: output/plots/balance_distribution.png
 ```
 
+
+
+### Visualization
+
+1. Calculates variance of `ending_balance` in continuous running fashion after each transaction.
+2. Plots histogram for Variance of Ending Balances for each input.
+3. Saves `balance_distribution.png` in `output/visuals`
+
+![balance_distribution.png](output/visuals/balance_distribution.png)
 
 ---
 
