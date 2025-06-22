@@ -12,7 +12,7 @@ if __name__ == '__main__':
     # Loading data
     parser = Pdf2MarkdownParser()
     # Extracting data
-    extractor = LLMExtractor(parser, Model.DEEPSEEK)
+    extractor = LLMExtractor(parser, Model.LLAMA_LG)
     bank_statements = extractor.extract()
     print(json.dumps(bank_statements))
 
@@ -24,8 +24,8 @@ if __name__ == '__main__':
     for name in is_valid.keys():
         print(f"Validating for Bank: {name}")
         if not is_valid[name]:
-            print(f"\tStatement has discrepancy")
-            print(f"\t{validator.get_discrepancy()[name]}")
+            print(f"! Statement has discrepancy")
+            print(f"{validator.get_discrepancy()[name]}")
         else:
             print(f"\tStatement is valid, no discrepancy")
         print("=======================================\n\n")

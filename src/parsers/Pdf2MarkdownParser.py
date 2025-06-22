@@ -50,6 +50,7 @@ class Pdf2MarkdownParser(Parser):
             try:
                 cached_markdown_text = get_disk_cache(pdf_path.name)
                 if cached_markdown_text is not None:
+                    print(f"Loading form cache for {pdf_path.name}")
                     all_markdown_content[pdf_path.name] = cached_markdown_text
                 else:
                     rendered = self.converter(str(pdf_path))

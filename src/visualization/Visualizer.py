@@ -20,40 +20,52 @@ class Visualizer:
 
     def plot_balance_distribution(self, statements_data: Dict[str, Dict[str, Any]]) -> None:
         """
-        Calculates variance and creates a histogram of ending balances.
+        Calculates and plots the variance of running balances across all transactions in all statements.
         """
         if not statements_data:
             print("Warning: No statement data provided to visualize.")
             return
 
-        starting_balances = []
-        ending_balances = []
-        transaction_volumes = []
+        running_balances = []
 
-        for key in statements_data.keys():
-            statement_details = statements_data[key]
-            if not statement_details:
+        for key, statement in statements_data.items():
+            if not statement:
                 print(f"WARNING: Empty statement_details for {key}, skipping")
                 continue
-            starting_balances.append(statement_details.get(STARTING_BALANCE, 0))
-            ending_balances.append(statement_details.get(ENDING_BALANCE, 0))
-            transaction_volumes.append(len(statement_details.get(TRANSACTIONS, [])))
+
+            balance = statement.get(STARTING_BALANCE, 0)
+            transactions = statement.get(TRANSACTIONS, [])
+
+            for txn in transactions:
+                direction = txn.get("direction", "").lower()
+                amount = txn.get("amount", 0)
+
+                if direction == "debit":
+                    balance -= amount
+                elif direction == "credit":
+                    balance += amount
+                else:
+                    print(f"! Unknown direction '{direction}' in {key}, skipping transaction.")
+                    continue
+
+                running_balances.append(balance)
+
+        if not running_balances:
+            print("No running balances computed; cannot plot.")
+            return
 
         # --- Variance Calculation ---
-        self.starting_balance_variance = np.var(starting_balances) if starting_balances else 0
-        self.ending_balance_variance = np.var(ending_balances) if ending_balances else 0
-        self.transaction_volume_variance = np.var(transaction_volumes) if transaction_volumes else 0
+        self.running_balance_variance = np.var(running_balances)
 
         # --- Graph Plotting ---
         self.fig, self.ax = plt.subplots(figsize=(12, 7))
         sns.set_theme(style="whitegrid")
 
-        # Create a histogram to show the number of statements per ending balance category
-        sns.histplot(data=ending_balances, kde=True, ax=self.ax, bins=10)
+        sns.histplot(data=running_balances, kde=True, ax=self.ax, bins=10)
 
-        self.ax.set_title('Distribution of Ending Balances Across Bank Statements', fontsize=16)
-        self.ax.set_xlabel('Ending Balance Value', fontsize=12)
-        self.ax.set_ylabel('Number of Bank Statements', fontsize=12)
+        self.ax.set_title('Distribution of Running Balances Across All Transactions', fontsize=16)
+        self.ax.set_xlabel('Running Balance Value', fontsize=12)
+        self.ax.set_ylabel('Frequency', fontsize=12)
 
     def save_plot(self, config: Dict) -> None:
         output_path = config["plots_output_dir"]

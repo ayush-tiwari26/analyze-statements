@@ -1,7 +1,7 @@
 import pickle
 from pathlib import Path
 
-_CACHE_DIR = Path(__file__).resolve().parent / "resources" / "cache"
+_CACHE_DIR = base_dir = Path(__file__).resolve().parents[2] / "resources" / "cache"
 
 
 def _ensure_cache_dir() -> None:
