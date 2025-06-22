@@ -5,6 +5,7 @@ AMOUNT = "amount"
 DIRECTION = "direction"
 CREDIT = "credit"
 DEBIT = "debit"
+DISCREPANCY_NOTE = "discrepancy"
 
 VALIDATION_TOLERANCE = 10
 # Validation Excel columns
@@ -15,3 +16,4 @@ CSV_DISCREPANCY = "Discrepancy"
 CSV_TOTAL_CREDIT = "Total Credit"
 CSV_TOTAL_DEBIT = "Total Debit"
 CSV_DISCREPANCY_PERCENTAGE = "Discrepancy as % of transaction volume"
+CSV_DISCREPANCY_NOTE = "Discrepancy note"

@@ -38,18 +38,16 @@ flowchart TD
 3. **Extraction** – `LLMExtractor` (or `VanillaExtractor`) converts raw text ➜ structured transaction statments JSON:
 
 ```json
-{
-  "starting_balance": 2500.00,
-  "ending_balance": 4230.25,
-  "transactions": [
-    { "date": "2024-01-02", 
-       "description": "Amazon", 
-       "amount": 499.99, 
-       "direction": "debit"
-    }
-  ],
-  "discrepancy": null
-}
+[
+   {
+    "starting_balance": 2500.0,
+    "ending_balance": 4230.25,
+    "transactions": [
+       { "date": "2024-01-02", "description": "Amazon", "amount": 499.99, "direction": "debit"}
+    ],
+    "discrepancy": "Some note"
+   }
+]
 ```
 
 4. **Validation** – `VanillaValidator` recomputes the ending balance and flags any gap (≤ 10 tolerance by default).
@@ -183,17 +181,18 @@ Found 20 PDF file(s).
      { "date": "2024-01-02", "description": "Amazon", "amount": 499.99, "direction": "debit"},
      …
   ],
-  "discrepancy": null
+  "discrepancy": "Some note"
 }
 
-True                # <- validation passed
-Calculated ending balance: 4230.25
-Provided ending balance: 4230.25
-Discrepancy: +0.00
-Total Credit: 8750.50
-Total Debit: 10500.75
-Discrepancy as % of transaction volume: 0.00%
-Visualization saved successfully to: output/plots/balance_distribution.png
+Validating for Bank: 16.pdf
+! Statement has discrepancy
+Calculated ending balance: -13783.34
+Provided ending balance: 17998.79
+Discrepancy: -31782.13
+Total Credit: 173883.79
+Total Debit: 157952.66
+Discrepancy as % of transaction volume: 9.58%
+Discrepancy note: Transaction for 'JACK IN THE BOX 8372' on 2023-05-21 has missing or invalid amount; please verify.
 ```
 
 

@@ -51,6 +51,7 @@ class VanillaValidator(Validator):
                 start_balance = self.data[bank_name][STARTING_BALANCE]
                 end_balance = self.data[bank_name][ENDING_BALANCE]
                 transactions = self.data[bank_name][TRANSACTIONS]
+                discrepancy_note = self.data[bank_name][DISCREPANCY_NOTE]
 
                 calculated_balance = start_balance
                 total_credit = 0.0
@@ -80,7 +81,8 @@ class VanillaValidator(Validator):
                     CSV_DISCREPANCY: discrepancy,
                     CSV_TOTAL_CREDIT: total_credit,
                     CSV_TOTAL_DEBIT: total_debit,
-                    CSV_DISCREPANCY_PERCENTAGE: discrepancy_percent
+                    CSV_DISCREPANCY_PERCENTAGE: discrepancy_percent,
+                    CSV_DISCREPANCY_NOTE: discrepancy_note
                 }
 
                 result[bank_name] = (
@@ -89,7 +91,8 @@ class VanillaValidator(Validator):
                     f"Discrepancy: {discrepancy:+.2f}\n"
                     f"Total Credit: {total_credit:.2f}\n"
                     f"Total Debit: {total_debit:.2f}\n"
-                    f"Discrepancy as % of transaction volume: {discrepancy_percent}"
+                    f"Discrepancy as % of transaction volume: {discrepancy_percent}\n"
+                    f"{CSV_DISCREPANCY_NOTE}: {discrepancy_note}"
                 )
 
             except Exception as e:
@@ -101,25 +104,28 @@ class VanillaValidator(Validator):
         return self.discrepancy
 
     def _save_discrepancy_to_excel(self, discrepancy_data: Dict[str, Dict]):
+        columns = [
+            CSV_REPORT_NAME,
+            CSV_CALC_ENDING_BALANCE,
+            CSV_INIT_ENDING_BALANCE,
+            CSV_DISCREPANCY,
+            CSV_TOTAL_CREDIT,
+            CSV_TOTAL_DEBIT,
+            CSV_DISCREPANCY_PERCENTAGE,
+            DISCREPANCY_NOTE
+        ]
         rows = []
+
         for bank_name, details in discrepancy_data.items():
             if details is None:
-                row = [bank_name] + [""] * 6
+                row = [bank_name] + [""] * (len(columns)-1)
             else:
                 row = [bank_name]
                 for key, value in details.items():
                     row.append(value)
             rows.append(row)
 
-        columns = [
-            "Bank Name",
-            "Calculated ending balance",
-            "Provided ending balance",
-            "Discrepancy",
-            "Total Credit",
-            "Total Debit",
-            "Discrepancy as % of transaction volume"
-        ]
+
         df = pd.DataFrame(rows, columns=columns)
 
         output_dir = load_configs()["validation_output_dir"]

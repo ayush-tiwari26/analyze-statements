@@ -63,8 +63,8 @@ class Visualizer:
                      marker="o")
 
         self.ax.set_title('Distribution of Running Balances Across All Transactions', fontsize=16)
-        self.ax.set_xlabel('Running Balance Value', fontsize=12)
-        self.ax.set_ylabel('Frequency', fontsize=12)
+        self.ax.set_xlabel('Bank Statment', fontsize=12)
+        self.ax.set_ylabel('Ending Balance Variance', fontsize=12)
 
     def save_plot(self, config: Dict) -> None:
         output_path = config["plots_output_dir"]
