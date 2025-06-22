@@ -24,10 +24,10 @@ if __name__ == '__main__':
     for name in is_valid.keys():
         print(f"Validating for Bank: {name}")
         if not is_valid[name]:
-            print(f"\tStatement is Invalid")
+            print(f"\tStatement has discrepancy")
             print(f"\t{validator.get_discrepancy()}")
         else:
-            print(f"\tStatement is valid")
+            print(f"\tStatement is valid, no discrepancy")
         print("=======================================\n\n")
 
     # Visualization

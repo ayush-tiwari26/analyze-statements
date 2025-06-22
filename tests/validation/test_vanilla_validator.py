@@ -1,6 +1,6 @@
 import pytest
 from src.validation.VanillaValidator import VanillaValidator
-from src.utils.Constants import (
+from src.utils.constants import (
     STARTING_BALANCE,
     ENDING_BALANCE,
     TRANSACTIONS,

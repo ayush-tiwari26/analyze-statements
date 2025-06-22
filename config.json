@@ -1,5 +1,8 @@
 {
   "drive_input": "https://drive.google.com/drive/u/2/folders/1ezBe4hPnUY1x-n4eI9WfCS8nHxTr_0pq",
   "local_pdf_source": "/Users/ayush.tiwari/Desktop/python/kaaj/resources/data",
-  "plots_output_dir": "output"
+  "plots_output_dir": "output/visuals",
+  "validation_output_dir": "output/validation",
+  "bearer_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNkYzA3ZjY3LTRiMWItNDAzYi04MWVkLTgzNzMzOGEwZGFlZiJ9.QE2TvCjwHphtaEdhGV12waTf6t5G612CTXxk1Av2amg",
+  "llm_base_url": "http://localhost:3000/api/chat/completions"
 }

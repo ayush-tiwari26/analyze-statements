@@ -40,7 +40,7 @@ class PdfParser(Parser):
                 doc = pymupdf.open(pdf_path)
                 full_text = ""
                 for page in doc:
-                    full_text += page.get_text("text")  # "text" argument for plain text
+                    full_text += page.get_text("text")
                 doc.close()
                 # Use the filename as the key
                 all_content[pdf_path.name] = full_text

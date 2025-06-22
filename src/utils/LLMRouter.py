@@ -4,6 +4,8 @@ import requests
 import os
 from datetime import datetime
 
+from src.utils.load_configs import load_configs
+
 
 class Model(enum.Enum):
 
@@ -19,8 +21,8 @@ class Model(enum.Enum):
 
 
 class LLMRouter:
-    API_URL = 'http://localhost:3000/api/chat/completions'
-    AUTH_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNkYzA3ZjY3LTRiMWItNDAzYi04MWVkLTgzNzMzOGEwZGFlZiJ9.QE2TvCjwHphtaEdhGV12waTf6t5G612CTXxk1Av2amg'
+    API_URL = load_configs()["llm_base_url"]
+    AUTH_TOKEN = load_configs()["bearer_token"]
     LOG_DIR = 'logs'
 
     def __init__(self):

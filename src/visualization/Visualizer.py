@@ -4,7 +4,7 @@ import numpy as np
 from typing import Dict, Any
 from pathlib import Path
 
-from src.utils.Constants import *
+from src.utils.constants import *
 
 
 class Visualizer:
